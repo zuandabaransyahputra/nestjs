@@ -1,34 +1,20 @@
-import {
-  Controller,
-  Get,
-  Post as Posting,
-  Body,
-  Put,
-  Param,
-  ParseIntPipe,
-} from '@nestjs/common';
+import { Controller, Get, Post, Body, Param } from '@nestjs/common';
 import { PostService } from './post.service';
-import { Post } from '@prisma/client';
+import { Post as PostModel } from '@prisma/client';
 
 @Controller('post')
 export class PostController {
   constructor(private readonly postService: PostService) {}
 
-  @Get()
-  async getPosts(): Promise<Post[]> {
-    return this.postService.getAllPosts();
+  @Get(':la')
+  async getPosts(@Param('la') la: string): Promise<PostModel[]> {
+    return this.postService.getPostsByLanguage(la);
   }
 
-  @Posting()
-  async createUser(@Body() body: { title: string }): Promise<Post> {
-    return this.postService.createPost(body);
-  }
-
-  @Put(':id')
-  async updatePost(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() body: { title?: string },
-  ): Promise<Post> {
-    return this.postService.updatePost(id, body);
+  @Post()
+  async createPost(
+    @Body() postData: { title: string; lang: string },
+  ): Promise<PostModel> {
+    return this.postService.createPost(postData);
   }
 }
